@@ -55,16 +55,15 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
 
 
 	file.write("Output25: " + str(len(eventsInFile(testSetFilename))) + "\n")
-
-
-
 	file.close
 
 
-def validateLidstone(testSet, lamda , vocabolarySize):
-	p = (vocabolarySize-len(set(testSet))) * pLidstone('unseen-word' , testSet , lamda , vocabolarySize)
-	prop = [pLidstone(word, testSet, lamda , vocabolarySize) for word in set(testSet)]
-	return sum(prop) + p 
+
+def validateLidstone(testWordSet, lamda):
+	allunseenpropability = (testWordSet.vocabularySize - testWordSet.distinctLength) * testWordSet.pLidstone('unseen-word' , lamda)
+	eventspropabilities = [testWordSet.pLidstone(word, lamda) for word in testWordSet.distinctItems()]
+
+	return sum(eventspropabilities) + allunseenpropability
 
 def minimumPerplexityZeroToTwo(trainingWordSet, validationWordSet):
 	lamdagen = lamdaGenerator(0.01, 2, 0.01)
@@ -78,71 +77,32 @@ def minimumPerplexityZeroToTwo(trainingWordSet, validationWordSet):
 
 	return minperplexity, minlamda
 
-
 def lamdaGenerator(start, end, jump):
 	current = start;
 	while current < end:
 		yield current
 		current += jump
 
-# n = vocabolarySize
 def perplexity(trainingWordSet , validationWordSet, lamda):
 	logs = [math.log(trainingWordSet.pLidstone(word, lamda))*appearances for word, appearances in validationWordSet.distinctItems() if True]
-	#logs = []
-	#for word in set(validationSet):
-	#	logs.append
-	#logs.append((vocabolarySize-len(logs)) * pLidstone('unseen-word',trainingSet, lamda, vocabolarySize))
-	
-	#return 2**(-1*sum(logs)/vocabolarySize)
+
 	return math.pow(math.e, -1*sum(logs)/validationWordSet.length)
-
-
-# returns the number of times events showed up in frequency like input-word in HeldOut set
-# def calctTr(trainingSet , inputWord):
-	#c = Counter(words)
-    #for word, count in c.most_common():
- 	#	   print word, count
-
-
-def pLidstone(inputWord, trainingSet, lamda, vocabolarySize):
-	return (numAppearnesInTrainingSet(inputWord, trainingSet) + lamda) / (len(trainingSet) + vocabolarySize * lamda)
-
-def pMaximumLikelihoodEstimate(inputWord, trainingSet):
-	return float(numAppearnesInTrainingSet(inputWord, trainingSet)) / len(trainingSet)
 
 def calcPuniform(vocabolarySize):
 	return 1/float(vocabolarySize)
 
-def calcNumWordsDevelopmentSet(developmentSetFilename):
-	with open(developmentSetFilename,"r") as f:
-		words = [word for line in f for word in line.split()]
-        return len(words)
-
-def numEventsTrainingSetLidston(numberOfEvents):
-	return int(round(numberOfEvents*0.9))
-
 def numEventsTrainingSetHeldOut(numberOfEvents):
 	return int(round(numberOfEvents*0.5))
-
 
 def eventsInFile(developmentSetFilename):
 	with open(developmentSetFilename,"r") as f:
 		words = [word for line in f for word in line.split()]
 		return words
-		#return len(set(words[0:]))
-
-def numAppearnesInTrainingSet(inputWord, trainingSet):
-	return len([word for word in trainingSet if word == inputWord])
-
-
 
 
 def main():
-	#sample(10,"Saar the king")
 	generateOutputFile("develop.txt","test.txt",
 		"the","saar")
-
-
 
 if __name__ == '__main__':
 	main()
