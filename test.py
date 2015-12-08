@@ -3,8 +3,9 @@ import math
 from WordSet import WordSet
 from HeldOutWordSet import HeldOutWordSet
 
+
 def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outputFilename):
-    print 1
+    print "Started"
     vocabularySize = 300000
     ouptFilename = 'D:\Git\AppliedPropabilityBIU\output.txt'
     file = open(ouptFilename, "w+")
@@ -28,7 +29,9 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output11: " + str(trainingWordSet.countAppearances(inputWord)) + "\n")
     file.write("Output12: " + str(trainingWordSet.pMaximumLikelihoodEstimate(inputWord)) + "\n")
     file.write("Output13: " + str(trainingWordSet.pMaximumLikelihoodEstimate("unseen-word")) + "\n")
-    print validateLidstone(validationWordSet, 0.1)
+
+    print "Lidstone validation: " + str(validateLidstone(validationWordSet, 0.1))
+
     file.write("Output14: " + str(trainingWordSet.pLidstone(inputWord, 0.1)) + "\n")
     file.write("Output15: " + str(trainingWordSet.pLidstone("unseen-word", 0.1)) + "\n")
     file.write("Output16: " + str(lidstonPerplexity(trainingWordSet, validationWordSet, 0.01)) + "\n")
@@ -40,10 +43,11 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output19: " + str(minlamda) + "\n")
     file.write("Output20: " + str(minperplexity) + "\n")
 
-     # HeldOut model
+    # HeldOut model
     cuttingHeldOutIndex = int(round(len(words) * 0.5))
     heldOutTrainingSet, heldOutSet = words[:cuttingHeldOutIndex], words[cuttingHeldOutIndex:]
-    heldOutTrainingWordSet, heldOutWordSet = WordSet(heldOutTrainingSet, vocabularySize), WordSet(heldOutSet, vocabularySize)
+    heldOutTrainingWordSet, heldOutWordSet = WordSet(heldOutTrainingSet, vocabularySize), WordSet(heldOutSet,
+                                                                                                  vocabularySize)
 
     heldOut = HeldOutWordSet(heldOutTrainingWordSet, heldOutWordSet)
     file.write("Output21: " + str(len(heldOutTrainingSet)) + "\n")
@@ -52,13 +56,14 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output24: " + str(heldOut.pHeldOut("unseen-word")) + "\n")
 
     testWords = eventsInFile(testSetFilename)
-    #file.write("Output25: " + str(len(testWords)) + "\n")
-    print "saar validate:" +str(heldOut.validateHeldOut(heldOutTrainingWordSet))
+    # file.write("Output25: " + str(len(testWords)) + "\n")
+    print "Held Out validation: " + str(heldOut.validateHeldOut(heldOutTrainingWordSet))
     # 26
     # file.write("Output27: " + str(heldOutPerplexity(heldOutSet,trainingSet,vocabularySize,testWords)) + "\n")
 
     file.close
-    print 3
+    print "Ended"
+
 
 def validateLidstone(testWordSet, lamda):
     allunseenpropability = (testWordSet.vocabularySize - testWordSet.distinctLength) * testWordSet.pLidstone(
@@ -98,7 +103,6 @@ def lidstonPerplexity(trainingWordSet, validationWordSet, lamda):
 # iterate each word in testSet and calculates his Pheldout according to the developmentSet:
 # [heldOutSet,trainingSet]
 def heldOutPerplexity(heldOut, testWorkSet):
-
     logs = [math.log(heldOut.pHeldOut(word)) * appearances for word, appearances in testWorkSet.distinctItems() if True]
     # logs = [math.log(pHeldOut(heldOutWorkSet,trainingSet,word,vocabolarySize)) for word in testSet]
 
@@ -107,6 +111,7 @@ def heldOutPerplexity(heldOut, testWorkSet):
 
 def calcPuniform(vocabolarySize):
     return 1 / float(vocabolarySize)
+
 
 def eventsInFile(developmentSetFilename):
     with open(developmentSetFilename, "r") as f:
