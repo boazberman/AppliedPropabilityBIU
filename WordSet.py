@@ -3,7 +3,7 @@ class WordSet:
     def __init__(self, words, vocabularySize):
         self.wordAppearanceCounter = Counter(words)
         self.length = len(words)
-        self.distinctLength = sum(self.wordAppearanceCounter.values())
+        self.distinctLength = len(self.wordAppearanceCounter.keys())
         # self.pLidstone = {}
         self.vocabularySize = vocabularySize
 

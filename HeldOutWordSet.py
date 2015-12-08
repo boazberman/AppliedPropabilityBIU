@@ -2,14 +2,14 @@ from collections import Counter
 
 
 class HeldOutWordSet:
-    def __init__(self, heldOutWordSet, trainingWordSet):
-        self.heldOutWordSet = heldOutWordSet
+    def __init__(self, trainingWordSet, heldOutWordSet):
         self.trainingWordSet = trainingWordSet
+        self.heldOutWordSet = heldOutWordSet
         self.tr, self.nr = self.calctTRandNR()
 
     def pHeldOut(self, word):
-        return float(self.tr[self.trainingWordSet.wordAppiearanceCounter[word]]) / (
-        self.heldOutWordSet.distinctLength * self.nr[self.trainingWordSet.wordAppearanceCounter[word]])
+        return float(self.tr[self.trainingWordSet.wordAppearanceCounter[word]]) / (
+        self.heldOutWordSet.length * self.nr[self.trainingWordSet.wordAppearanceCounter[word]])
 
     # calculates nr and tr for a given heldOutSet & trainingSet
     def calctTRandNR(self):
@@ -38,8 +38,8 @@ class HeldOutWordSet:
 
         return tr, nr
 
-    def validateHeldOut(self, trainingSet):
-	p = ((self.heldOutWordSet.vocabularySize - len(set(trainingSet))) * self.pHeldOut("unseen-word"))
-	prop = [self.pHeldOut(word) for word in set(trainingSet)]
+    def validateHeldOut(self, trainingWordSet):
+	p = ((self.heldOutWordSet.vocabularySize - trainingWordSet.distinctLength) * self.pHeldOut("unseen-word"))
+	prop = [self.pHeldOut(word) for word, amount in trainingWordSet.distinctItems()]
 
 	return sum(prop) + p

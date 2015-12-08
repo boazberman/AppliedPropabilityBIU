@@ -3,19 +3,10 @@ import math
 from WordSet import WordSet
 from HeldOutWordSet import HeldOutWordSet
 
-
-def sample(range, strToPrint):
-    print strToPrint
-    print range
-
-    for boaz in range(4):
-        print boaz
-
-
 def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outputFilename):
     print 1
     vocabularySize = 300000
-    ouptFilename = 'C:\Git\Probablity2\output.txt'
+    ouptFilename = 'D:\Git\AppliedPropabilityBIU\output.txt'
     file = open(ouptFilename, "w+")
     file.write("Output1: " + developmentSetFilename + "\n")
     file.write("Output2: " + testSetFilename + "\n")
@@ -37,6 +28,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output11: " + str(trainingWordSet.countAppearances(inputWord)) + "\n")
     file.write("Output12: " + str(trainingWordSet.pMaximumLikelihoodEstimate(inputWord)) + "\n")
     file.write("Output13: " + str(trainingWordSet.pMaximumLikelihoodEstimate("unseen-word")) + "\n")
+    print validateLidstone(validationWordSet, 0.1)
     file.write("Output14: " + str(trainingWordSet.pLidstone(inputWord, 0.1)) + "\n")
     file.write("Output15: " + str(trainingWordSet.pLidstone("unseen-word", 0.1)) + "\n")
     file.write("Output16: " + str(lidstonPerplexity(trainingWordSet, validationWordSet, 0.01)) + "\n")
@@ -61,7 +53,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
 
     testWords = eventsInFile(testSetFilename)
     #file.write("Output25: " + str(len(testWords)) + "\n")
-    print "saar validate:" +str(heldOut.validateHeldOut(testWords))
+    print "saar validate:" +str(heldOut.validateHeldOut(heldOutTrainingWordSet))
     # 26
     # file.write("Output27: " + str(heldOutPerplexity(heldOutSet,trainingSet,vocabularySize,testWords)) + "\n")
 
@@ -71,7 +63,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
 def validateLidstone(testWordSet, lamda):
     allunseenpropability = (testWordSet.vocabularySize - testWordSet.distinctLength) * testWordSet.pLidstone(
         'unseen-word', lamda)
-    eventspropabilities = [testWordSet.pLidstone(word, lamda) for word in testWordSet.distinctItems()]
+    eventspropabilities = [testWordSet.pLidstone(word, lamda) for word, amount in testWordSet.distinctItems()]
 
     return sum(eventspropabilities) + allunseenpropability
 
@@ -90,7 +82,7 @@ def minimumPerplexityZeroToTwo(trainingWordSet, validationWordSet):
 
 
 def lamdaGenerator(start, end, jump):
-    current = start;
+    current = start
     while current < end:
         yield current
         current += jump
