@@ -57,7 +57,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
 	file.write("Output25: " + str(len(eventsInFile(testSetFilename))) + "\n")
 	file.close
 
-	print 1
+	print 3
 
 
 
