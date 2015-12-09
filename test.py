@@ -7,7 +7,7 @@ from HeldOutWordSet import HeldOutWordSet
 def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outputFilename):
     print "Started"
     vocabularySize = 300000
-    ouptFilename = 'D:\Git\AppliedPropabilityBIU\output.txt'
+    ouptFilename = 'C:\Git\Probablity2\output.txt'
     file = open(ouptFilename, "w+")
     file.write("Output1: " + developmentSetFilename + "\n")
     file.write("Output2: " + testSetFilename + "\n")
@@ -48,18 +48,24 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     heldOutTrainingSet, heldOutSet = words[:cuttingHeldOutIndex], words[cuttingHeldOutIndex:]
     heldOutTrainingWordSet, heldOutWordSet = WordSet(heldOutTrainingSet, vocabularySize), WordSet(heldOutSet,
                                                                                                   vocabularySize)
-
     heldOut = HeldOutWordSet(heldOutTrainingWordSet, heldOutWordSet)
     file.write("Output21: " + str(len(heldOutTrainingSet)) + "\n")
     file.write("Output22: " + str(len(heldOutSet)) + "\n")
     file.write("Output23: " + str(heldOut.pHeldOut(inputWord)) + "\n")
     file.write("Output24: " + str(heldOut.pHeldOut("unseen-word")) + "\n")
-
-    testWords = eventsInFile(testSetFilename)
-    # file.write("Output25: " + str(len(testWords)) + "\n")
     print "Held Out validation: " + str(heldOut.validateHeldOut(heldOutTrainingWordSet))
-    # 26
-    # file.write("Output27: " + str(heldOutPerplexity(heldOutSet,trainingSet,vocabularySize,testWords)) + "\n")
+
+    # new by saar - 12.9
+    testWords = eventsInFile(testSetFilename)
+    testTrainingSet = WordSet(testWords, vocabularySize)
+    file.write("Output25: " + str(len(testWords)) + "\n")
+    # find out if the perplexity should be done on testTrainingSet with the old trainingWordSet that we
+    # calculate with him the minLamda
+    lidstonPerplexityVar = lidstonPerplexity(trainingWordSet, testTrainingSet, minlamda)
+    heldOutPerplexityVar = heldOutPerplexity(heldOut, testTrainingSet)
+    file.write("Output26: " + str(lidstonPerplexityVar) + "\n")
+    file.write("Output27: " + str(heldOutPerplexityVar) + "\n")
+    file.write("Output28: " + ('L' if lidstonPerplexityVar > heldOutPerplexityVar else 'H') + "\n")
 
     file.close
     print "Ended"
@@ -104,7 +110,6 @@ def lidstonPerplexity(trainingWordSet, validationWordSet, lamda):
 # [heldOutSet,trainingSet]
 def heldOutPerplexity(heldOut, testWorkSet):
     logs = [math.log(heldOut.pHeldOut(word)) * appearances for word, appearances in testWorkSet.distinctItems() if True]
-    # logs = [math.log(pHeldOut(heldOutWorkSet,trainingSet,word,vocabolarySize)) for word in testSet]
 
     return math.pow(math.e, -1 * sum(logs) / testWorkSet.length)
 
