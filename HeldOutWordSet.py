@@ -11,6 +11,9 @@ class HeldOutWordSet:
         return float(self.tr[self.trainingWordSet.wordAppearanceCounter[word]]) / (
         self.heldOutWordSet.length * self.nr[self.trainingWordSet.wordAppearanceCounter[word]])
 
+    def pHeldOutByFreq(self, freq):
+        return float(self.tr[freq]) / ( self.heldOutWordSet.length * self.nr[freq])
+
     # calculates nr and tr for a given heldOutSet & trainingSet
     def calctTRandNR(self):
         # counts all the words in held-out set and maps it to a list, each item is like : (word : freq)

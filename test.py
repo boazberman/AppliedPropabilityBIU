@@ -1,6 +1,9 @@
 from collections import Counter
 import math
 import sys
+
+from pip.utils import outdated
+
 from WordSet import WordSet
 from HeldOutWordSet import HeldOutWordSet
 
@@ -13,8 +16,8 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     print "\tOutput filename: %s" % outputFilename
 
     vocabularySize = 300000
-    # ouptFilename = 'C:\Git\Probablity2\output.txt'
     file = open(outputFilename, "w+")
+    file.write("#Students:\tSaar Arbel (315681775), Boaz Berman (311504401)\n")
     file.write("Output1: " + developmentSetFilename + "\n")
     file.write("Output2: " + testSetFilename + "\n")
     file.write("Output3: " + inputWord + "\n")
@@ -77,7 +80,8 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output26: " + str(lidstonPerplexityVar) + "\n")
     file.write("Output27: " + str(heldOutPerplexityVar) + "\n")
     file.write("Output28: " + ('L' if lidstonPerplexityVar < heldOutPerplexityVar else 'H') + "\n")
-
+    file.write("Output29:")
+    file.write(printTable(heldOut, trainingWordSet , minlamda))
     file.close
     print "Ended"
 
@@ -144,6 +148,15 @@ def parse_file_data(file_data):
     words = words[:-1]
     # create a list of all the words
     return words.split(' ')
+
+def printTable(heldOutModel , lidatonModel, minLamda):
+    outputLine = '\n'
+    for frequncy in xrange(10):
+        outputLine += str(frequncy) + '\t' + str(round(lidatonModel.pLidstoneByFreq(minLamda,frequncy) * lidatonModel.length , 5))
+        outputLine += '\t' + str(round(heldOutModel.pHeldOutByFreq(frequncy)  * heldOutModel.trainingWordSet.length , 5))
+        outputLine += '\t' + str(heldOutModel.nr[frequncy]) + '\t' + str(heldOutModel.tr[frequncy])
+        outputLine += '\n'
+    return outputLine
 
 def main():
     if len(sys.argv) != 5:
