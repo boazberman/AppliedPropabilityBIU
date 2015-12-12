@@ -43,3 +43,6 @@ class WordSet:
         :return:
         '''
         return float(self.wordAppearanceCounter[word]) / self.length
+
+    def pLidstoneByFreq(self, lamda , freq):
+        return (freq + lamda) / (self.length + self.vocabularySize * lamda)

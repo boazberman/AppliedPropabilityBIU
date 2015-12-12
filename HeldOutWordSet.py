@@ -1,5 +1,6 @@
 from collections import Counter
 
+
 class HeldOutWordSet:
     '''
     An object describing an Held Out discount. This kind of build allows using presetted methods on the model.
@@ -23,6 +24,10 @@ class HeldOutWordSet:
         return float(self.tr[self.trainingWordSet.wordAppearanceCounter[word]]) / (
         self.heldOutWordSet.length * self.nr[self.trainingWordSet.wordAppearanceCounter[word]])
 
+    def pHeldOutByFreq(self, freq):
+        return float(self.tr[freq]) / ( self.heldOutWordSet.length * self.nr[freq])
+
+    # calculates nr and tr for a given heldOutSet & trainingSet
     def calctTRandNR(self):
         '''
         Calculated Tr and Nr:
