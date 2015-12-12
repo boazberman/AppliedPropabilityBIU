@@ -17,7 +17,10 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output6: " + str(calcPuniform(vocabularySize)) + "\n")
 
     # Lidstone model
-    words = eventsInFile(developmentSetFilename)
+    with open(developmentSetFilename, 'rb') as input_file:
+           input_file_data = input_file.read()
+    words = parse_file_data(input_file_data)
+
     cuttingIndex = int(round(len(words) * 0.9))
     trainingSet, validationSet = words[:cuttingIndex], words[cuttingIndex:]
     trainingWordSet, validationWordSet = WordSet(trainingSet, vocabularySize), WordSet(validationSet, vocabularySize)
@@ -55,8 +58,10 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output24: " + str(heldOut.pHeldOut("unseen-word")) + "\n")
     print "Held Out validation: " + str(heldOut.validateHeldOut(heldOutTrainingWordSet))
 
-    # new by saar - 12.9
-    testWords = eventsInFile(testSetFilename)
+    with open(testSetFilename, 'rb') as input_file_test:
+           input_file_data_test = input_file_test.read()
+    testWords = parse_file_data(input_file_data_test)
+
     testTrainingSet = WordSet(testWords, vocabularySize)
     file.write("Output25: " + str(len(testWords)) + "\n")
     # find out if the perplexity should be done on testTrainingSet with the old trainingWordSet that we
@@ -65,7 +70,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     heldOutPerplexityVar = heldOutPerplexity(heldOut, testTrainingSet)
     file.write("Output26: " + str(lidstonPerplexityVar) + "\n")
     file.write("Output27: " + str(heldOutPerplexityVar) + "\n")
-    file.write("Output28: " + ('L' if lidstonPerplexityVar > heldOutPerplexityVar else 'H') + "\n")
+    file.write("Output28: " + ('L' if lidstonPerplexityVar < heldOutPerplexityVar else 'H') + "\n")
 
     file.close
     print "Ended"
@@ -118,15 +123,25 @@ def calcPuniform(vocabolarySize):
     return 1 / float(vocabolarySize)
 
 
-def eventsInFile(developmentSetFilename):
-    with open(developmentSetFilename, "r") as f:
-        words = [word for line in f for word in line.split()]
-        return words
-
+def parse_file_data(file_data):
+    '''
+    parses the input file to a sequence (list) of words
+    @param file_data: the input file text
+    @return: a list of the files words
+    '''
+    # starting from the 3rd line, every 4th line is an article
+    file_lines = file_data.splitlines()[2::4]
+    # every article ends with a trailing space,
+    # so we get a string with all the words separated by one space
+    words = ''.join(file_lines)
+    # remove the last trailing space
+    words = words[:-1]
+    # create a list of all the words
+    return words.split(' ')
 
 def main():
     generateOutputFile("develop.txt", "test.txt",
-                       "the", "saar")
+                       "houston", "saar")
 
 
 if __name__ == '__main__':
