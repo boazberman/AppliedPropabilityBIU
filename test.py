@@ -1,8 +1,9 @@
-from collections import Counter
 import math
 import sys
-from WordSet import WordSet
+
 from HeldOutWordSet import HeldOutWordSet
+from WordSet import WordSet
+
 
 def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outputFilename):
     print "Started with:"
