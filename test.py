@@ -4,7 +4,6 @@ import sys
 from WordSet import WordSet
 from HeldOutWordSet import HeldOutWordSet
 
-
 def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outputFilename):
     print "Started with:"
     print "\tDevelopment set filename: %s" % developmentSetFilename
@@ -24,7 +23,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
 
     # Lidstone model
     with open(developmentSetFilename, 'rb') as input_file:
-           input_file_data = input_file.read()
+        input_file_data = input_file.read()
     words = parse_file_data(input_file_data)
 
     cuttingIndex = int(round(len(words) * 0.9))
@@ -65,7 +64,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     print "Held Out validation: " + str(heldOut.validateHeldOut(heldOutTrainingWordSet))
 
     with open(testSetFilename, 'rb') as input_file_test:
-           input_file_data_test = input_file_test.read()
+        input_file_data_test = input_file_test.read()
     testWords = parse_file_data(input_file_data_test)
 
     testTrainingSet = WordSet(testWords, vocabularySize)
@@ -83,6 +82,12 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
 
 
 def validateLidstone(testWordSet, lamda):
+    '''
+    A validation for the Lidstone discount. 1.0 is the wanted value.
+    :param testWordSet: The list of words to validate the Lidstone discount on. Instance of {WordSet}.
+    :param lamda: To test the discount with.
+    :return: the total of propabilities
+    '''
     allunseenpropability = (testWordSet.vocabularySize - testWordSet.distinctLength) * testWordSet.pLidstone(
         'unseen-word', lamda)
     eventspropabilities = [testWordSet.pLidstone(word, lamda) for word, amount in testWordSet.distinctItems()]
@@ -91,6 +96,13 @@ def validateLidstone(testWordSet, lamda):
 
 
 def minimumPerplexityZeroToTwo(trainingWordSet, validationWordSet):
+    '''
+    Calculating the perplexity of each of the lambdas in (0, 2] with jumps of 0.01. Then return the minimum perplexity
+     from between the perplexity caculated and its matching lambda.
+    :param trainingWordSet: Instance of {WordSet}.
+    :param validationWordSet: Instance of {WordSet}.
+    :return: min-perplexity, min-lambda
+    '''
     lamdagen = lamdaGenerator(0.01, 2, 0.01)
     minlamda = lamdagen.next()
     minperplexity = lidstonPerplexity(trainingWordSet, validationWordSet, minlamda)
@@ -104,6 +116,13 @@ def minimumPerplexityZeroToTwo(trainingWordSet, validationWordSet):
 
 
 def lamdaGenerator(start, end, jump):
+    '''
+    An iterable generating a lambda from [{start}, {end}] with jumps of {jump}.
+    :param start: A positive rational number.
+    :param end: A positive rational number.
+    :param jump: A positive rational number.
+    :return: lambda
+    '''
     current = start
     while current < end:
         yield current
@@ -111,21 +130,37 @@ def lamdaGenerator(start, end, jump):
 
 
 def lidstonPerplexity(trainingWordSet, validationWordSet, lamda):
+    '''
+    Iterate each distinct word in {testSet} and sum his Lidstone discount's propability with the given {lamda lambda}
+     multiplied by the times it appeared.
+    :param trainingWordSet: Instance of {WordSet}.
+    :param validationWordSet: Instance of {WordSet}.
+    :param lamda: A rational positive number.
+    :return:
+    '''
     logs = [math.log(trainingWordSet.pLidstone(word, lamda)) * appearances for word, appearances in
             validationWordSet.distinctItems() if True]
 
     return math.pow(math.e, -1 * sum(logs) / validationWordSet.length)
 
 
-# iterate each word in testSet and calculates his Pheldout according to the developmentSet:
-# [heldOutSet,trainingSet]
 def heldOutPerplexity(heldOut, testWorkSet):
+    '''
+    Iterate each distinct word in {testSet} and calculates his propability with Held Out discount.
+    :param heldOut: Instance of {HeldOutWordSet}.
+    :param testWorkSet: Instance of {WordSet}.
+    :return:
+    '''
     logs = [math.log(heldOut.pHeldOut(word)) * appearances for word, appearances in testWorkSet.distinctItems() if True]
 
     return math.pow(math.e, -1 * sum(logs) / testWorkSet.length)
 
 
 def calcPuniform(vocabolarySize):
+    '''
+    :param vocabolarySize: A natural number.
+    :return: The uniform propability of a word giving the vocabulary size.
+    '''
     return 1 / float(vocabolarySize)
 
 
@@ -145,7 +180,9 @@ def parse_file_data(file_data):
     # create a list of all the words
     return words.split(' ')
 
+
 def main():
+    # Validate the inputs.
     if len(sys.argv) != 5:
         print "How to use: " + sys.argv[
             0] + " < development_set_filename > < test_set_filename > < INPUT WORD > < output_filename >"
@@ -156,9 +193,7 @@ def main():
     input_word = sys.argv[3]
     output_file_path = sys.argv[4]
 
-    # generateOutputFile("develop.txt", "test.txt", "the", "saar.txt")
     generateOutputFile(development_file_path, test_file_path, input_word, output_file_path)
-
 
 if __name__ == '__main__':
     main()

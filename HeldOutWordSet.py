@@ -1,18 +1,35 @@
 from collections import Counter
 
-
 class HeldOutWordSet:
+    '''
+    An object describing an Held Out discount. This kind of build allows using presetted methods on the model.
+    '''
     def __init__(self, trainingWordSet, heldOutWordSet):
+        '''
+        :param trainingWordSet: Instance of {WordSet} that is used as our training set.
+        :param heldOutWordSet: Instance of {WordSet} that is used as our Held Out set.
+        :return: {HeldOutWordSet}
+        '''
         self.trainingWordSet = trainingWordSet
         self.heldOutWordSet = heldOutWordSet
         self.tr, self.nr = self.calctTRandNR()
 
     def pHeldOut(self, word):
+        '''
+        The propability of {word} to appear after applying it Held Out discount.
+        :param word:
+        :return:
+        '''
         return float(self.tr[self.trainingWordSet.wordAppearanceCounter[word]]) / (
         self.heldOutWordSet.length * self.nr[self.trainingWordSet.wordAppearanceCounter[word]])
 
-    # calculates nr and tr for a given heldOutSet & trainingSet
     def calctTRandNR(self):
+        '''
+        Calculated Tr and Nr:
+            Tr is the count of all appearances of words in the Held Out set that appeared r times in the training set.
+            Nr is the number of words that appeared r times in the training set.
+        :return: Tr, Nr
+        '''
         # counts all the words in held-out set and maps it to a list, each item is like : (word : freq)
         heldOutCounter = self.heldOutWordSet.wordAppearanceCounter
         # counts all the words in training set and maps it to a list, each item is like : (word : freq)
@@ -39,7 +56,12 @@ class HeldOutWordSet:
         return tr, nr
 
     def validateHeldOut(self, trainingWordSet):
-	p = ((self.heldOutWordSet.vocabularySize - trainingWordSet.distinctLength) * self.pHeldOut("unseen-word"))
-	prop = [self.pHeldOut(word) for word, amount in trainingWordSet.distinctItems()]
+        '''
+        A validation for the Held Out. 1.0 is the wanted value.
+        :param trainingWordSet: The list of words to validate the Held Out discount on.
+        :return: the total of propabilities
+        '''
+        p = ((self.heldOutWordSet.vocabularySize - trainingWordSet.distinctLength) * self.pHeldOut("unseen-word"))
+        prop = [self.pHeldOut(word) for word, amount in trainingWordSet.distinctItems()]
 
-	return sum(prop) + p
+        return sum(prop) + p
