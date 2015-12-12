@@ -1,14 +1,20 @@
 from collections import Counter
 import math
+import sys
 from WordSet import WordSet
 from HeldOutWordSet import HeldOutWordSet
 
 
 def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outputFilename):
-    print "Started"
+    print "Started with:"
+    print "\tDevelopment set filename: %s" % developmentSetFilename
+    print "\tTest set filename: %s" % testSetFilename
+    print "\tInput word: %s" % inputWord
+    print "\tOutput filename: %s" % outputFilename
+
     vocabularySize = 300000
-    ouptFilename = 'C:\Git\Probablity2\output.txt'
-    file = open(ouptFilename, "w+")
+    # ouptFilename = 'C:\Git\Probablity2\output.txt'
+    file = open(outputFilename, "w+")
     file.write("Output1: " + developmentSetFilename + "\n")
     file.write("Output2: " + testSetFilename + "\n")
     file.write("Output3: " + inputWord + "\n")
@@ -55,7 +61,6 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
     file.write("Output24: " + str(heldOut.pHeldOut("unseen-word")) + "\n")
     print "Held Out validation: " + str(heldOut.validateHeldOut(heldOutTrainingWordSet))
 
-    # new by saar - 12.9
     testWords = eventsInFile(testSetFilename)
     testTrainingSet = WordSet(testWords, vocabularySize)
     file.write("Output25: " + str(len(testWords)) + "\n")
@@ -125,8 +130,18 @@ def eventsInFile(developmentSetFilename):
 
 
 def main():
-    generateOutputFile("develop.txt", "test.txt",
-                       "the", "saar")
+    if len(sys.argv) != 5:
+        print "How to use: " + sys.argv[
+            0] + " < development_set_filename > < test_set_filename > < INPUT WORD > < output_filename >"
+        sys.exit(1)
+
+    development_file_path = sys.argv[1]
+    test_file_path = sys.argv[2]
+    input_word = sys.argv[3]
+    output_file_path = sys.argv[4]
+
+    # generateOutputFile("develop.txt", "test.txt", "the", "saar.txt")
+    generateOutputFile(development_file_path, test_file_path, input_word, output_file_path)
 
 
 if __name__ == '__main__':
