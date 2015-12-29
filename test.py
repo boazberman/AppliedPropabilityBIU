@@ -18,7 +18,6 @@ def generateOutputFile(developmentSetFilename, testSetFilename, inputWord, outpu
 
     vocabularySize = 300000
 
-    # ouptFilename = 'C:\Git\Probablity2\output.txt'
     file = open(outputFilename, "w+")
     file.write("#Students:\tSaar Arbel (315681775), Boaz Berman (311504401)\n")
     file.write("Output1: " + developmentSetFilename + "\n")
